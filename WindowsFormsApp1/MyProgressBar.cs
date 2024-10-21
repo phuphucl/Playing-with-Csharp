@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -16,6 +18,7 @@ using System.Xml.Linq;
 
 namespace WindowsFormsApp1
 {
+    [Designer(typeof(MyProgressDesigner))]
     public partial class MyProgressBar : UserControl, IDisposable
     {
         public enum EnProgressDirection
@@ -45,12 +48,19 @@ namespace WindowsFormsApp1
             _format.LineAlignment = StringAlignment.Center;
         }
 
+        //private int Abc(int a, ref string s, out DateTime dt)
+        //{
+        //    s = "Phuc";
+        //    dt = DateTime.Now;
+        //    return 100;
+        //}
+
         public new void Dispose()
         {
             base.Dispose();
             _fillBrush.Dispose();
             _textBrush.Dispose();
-            _format.Dispose(); 
+            _format.Dispose();
         }
 
         protected override void OnForeColorChanged(EventArgs e)
@@ -84,60 +94,66 @@ namespace WindowsFormsApp1
                     width = 0;
                 }
             }
-            else 
+            else
             {
-                if (_enProgressDirection == EnProgressDirection.Horizontal)
+                int value = _iValue;
+                if (value < Math.Min(_iMin, _iMax)) value = Math.Min(_iMin, _iMax);
+                else if (value > Math.Max(_iMin, _iMax))
                 {
-                    if (_iMin < _iMax)
-                    {
-                        int value = _iValue;
-                        if (value < _iMin) value = _iMin;
-                        else if (value > _iMax) value = _iMax;
+                    value = Math.Max(_iMin, _iMax);
+                }
 
-                        float percent = (float)(value - _iMin) / (_iMax - _iMin);
-                        text = (int)(percent * 100) + "%";
-                        width = percent * rc.Width;
-                    }
-                    else
-                    {
-                        int value = _iValue;
-                        if (value < _iMax) value = _iMax;
-                        else if (value > _iMin) value = _iMin;
-                        int range = _iMin - _iMax;
-                        value = Math.Abs(range - value);
-                        float percent = (float)value / range;
-                        text = (int)(percent * 100) + "%";
-                        width = percent * rc.Width;
-                        left = rc.Width - width;
-                    }
+                int range = Math.Abs(_iMin - _iMax);
+                float percent;
+                if (_iMin < _iMax)
+                {
+                    percent = (float)(value - _iMin) / range;
                 }
                 else
                 {
-                    if (_iMin < _iMax)
-                    {
-                        int value = _iValue;
-                        if (value < _iMin) value = _iMin;
-                        else if (value > _iMax) value = _iMax;
-
-                        float percent = (float)(value - _iMin) / (_iMax - _iMin);
-                        text = (int)(percent * 100) + "%";
-                        height = percent * rc.Height;
-                        top = rc.Height - height;
-                    }
-                    else
-                    {
-                        int value = _iValue;
-                        if (value < _iMax) value = _iMax;
-                        else if (value > _iMin) value = _iMin;
-                        int range = _iMin - _iMax;
-                        value = range - value;
-                        value = Math.Abs(value);
-                        float percent = (float)(value) / range;
-                        text = (int)(percent * 100) + "%";
-                        height = percent * rc.Height;
-                    }
-
+                    percent = (float)(Math.Abs(range - value)) / range;
                 }
+                text = (int)(percent * 100) + "%";
+                if (_enProgressDirection == EnProgressDirection.Horizontal)
+                {
+                    width = percent * rc.Width;
+                    if (_iMin > _iMax) left = rc.Width - width;
+                }
+                else
+                {
+                    height = percent * rc.Height;
+                    if (_iMin > _iMax) top = rc.Height - height;
+                }
+                //if (_iMin < _iMax)
+                //{
+                //    float percent = (float)(value - _iMin) / range;
+                //    text = (int)(percent * 100) + "%";
+                //    if (_enProgressDirection == EnProgressDirection.Horizontal)
+                //    {
+                //        width = percent * rc.Width;
+                //    }
+                //    else
+                //    {
+                //        height = percent * rc.Height;
+                //        top = rc.Height - height;
+                //    }
+                //}
+                //else
+                //{
+
+                //    value = Math.Abs(range - value);
+                //    float percent = (float)value / range;
+                //    text = (int)(percent * 100) + "%";
+                //    if (_enProgressDirection == EnProgressDirection.Horizontal)
+                //    {
+                //        width = percent * rc.Width;
+                //        left = rc.Width - width;
+                //    }
+                //    else
+                //    {
+                //        height = percent * rc.Height;
+                //    }
+                //}
             }
             graphics.FillRectangle(_fillBrush, left, top, width, height);
             if (_enProgressDirection == EnProgressDirection.Horizontal)
@@ -165,7 +181,7 @@ namespace WindowsFormsApp1
         public EnProgressDirection ProgressDirection
         {
             get => _enProgressDirection;
-            set 
+            set
             {
                 if (_enProgressDirection != value)
                 {
@@ -203,7 +219,7 @@ namespace WindowsFormsApp1
         /// Get or Set Minimum
         /// </summary>
         [Category("ProgressValues"), Browsable(true)]
-        public int Minimum 
+        public int Minimum
         {
             get => _iMin;
             set => SetProperty(ref _iMin, value);
@@ -246,41 +262,115 @@ namespace WindowsFormsApp1
             }
         }
 
-        private class TrackBarEditor: UITypeEditor
+        private int GetValue(int m)
         {
-            TrackBar _bar;
+            return m + 1;
+        }
+
+        private class MyProgressDesigner: ControlDesigner
+        {
+            private DesignerActionListCollection _actions;
+            public MyProgressDesigner()
+            {
+                _actions = new DesignerActionListCollection();
+                _actions.Add(new MyAction (this));
+            }
+            public override DesignerActionListCollection ActionLists => _actions;
+            public override void Initialize(IComponent component)
+            {
+                base.Initialize(component);
+                //MessageBox.Show("Initialize " + component);
+            }
+            protected override void PreFilterProperties(IDictionary properties)
+            {
+                //MessageBox.Show("PreFilterAttributes " );
+                RemoveProp(properties, "AccessibleName");
+                RemoveProp(properties, "AccessibleRole");
+                //properties.Remove("Minimum");
+                //base.PreFilterAttributes(attributes);
+            }
+            private void RemoveProp(IDictionary properties, string key)
+            {
+                if (properties.Contains(key)) properties.Remove(key);
+            }
+        }
+        private class MyAction: DesignerActionList
+        {
             MyProgressBar _progressBar;
-            bool _bLockUpdate = false;
-            public TrackBarEditor()
+            DesignerActionItemCollection _collectionItems;
+            public MyAction(MyProgressDesigner designer) : base(designer.Component)
             {
-                _bar = new TrackBar();
-                _bar.TickFrequency = 10;
-                _bar.ValueChanged += TrackBar_ValueChanged;
+                _progressBar = designer.Component as MyProgressBar;
+                _collectionItems = new DesignerActionItemCollection();
+                _collectionItems.Add(new DesignerActionMethodItem(this, "Setup", "Setup", true));
+
+                _collectionItems.Add(new DesignerActionMethodItem(this, "Venha", "Go Home"));
             }
 
-            private void TrackBar_ValueChanged(object sender, EventArgs e)
+            private void Setup()
             {
-                if (!_bLockUpdate)
-                {
-                    _bLockUpdate = true;
-                    _progressBar.Value = _bar.Value;
-                    _bLockUpdate = false;
-                }
+                MessageBox.Show("Setup");
+            }
+            private void Venha()
+            {
+                MessageBox.Show("Welcome home");
             }
 
-            public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+
+            public override DesignerActionItemCollection GetSortedActionItems() => _collectionItems;
+        }
+
+
+    }
+    public interface ITrackBarEditor
+    {
+        int GetMin();
+        int GetMax();
+        int GetValue();
+        void SetValue(int value);
+    }
+    public class TrackBarEditor : UITypeEditor
+    {
+        TrackBar _bar;
+        ITrackBarEditor _control;
+        bool _bLockUpdate = false;
+        public TrackBarEditor()
+        {
+            _bar = new TrackBar();
+            _bar.TickFrequency = 10;
+            _bar.ValueChanged += TrackBar_ValueChanged;
+        }
+
+        private void TrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            if (!_bLockUpdate)
             {
-                return UITypeEditorEditStyle.Modal;
+                _bLockUpdate = true;
+                _control.SetValue(_bar.Value);
+                _bLockUpdate = false;
             }
-            public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
+        }
+
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        {
+            return UITypeEditorEditStyle.Modal;
+        }
+        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
+        {
+            if (!_bLockUpdate)
             {
-                if (!_bLockUpdate)
+                try
                 {
-                    _progressBar = context.Instance as MyProgressBar;
-                    int iMinimum = _progressBar.Minimum;
-                    int iMaximum = _progressBar.Maximum;
+                    if (!(context.Instance is ITrackBarEditor))
+                    {
+                        MessageBox.Show(context.Instance.GetType().Name + " must implement interface ITrackBarEditor");
+                        return value;
+                    }
+                    _control = context.Instance as ITrackBarEditor;
+                    int iMinimum = _control.GetMin();
+                    int iMaximum = _control.GetMax();
                     if (iMinimum > iMaximum) Extension.Swap(ref iMinimum, ref iMaximum);
-                    int iValue = _progressBar.Value;
+                    int iValue = (int)value;
                     if (iValue < iMinimum) iValue = iMinimum;
                     else if (iValue > iMaximum) iValue = iMaximum;
                     _bar.Minimum = iMinimum;
@@ -291,9 +381,76 @@ namespace WindowsFormsApp1
                     IWindowsFormsEditorService service = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
 
                     service.DropDownControl(_bar);
+                    return _bar.Value;
                 }
-                return _bar.Value;
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            return value;
+        }
+
+
+    }
+    public class TrackBarEditor1 : UITypeEditor
+    {
+        TrackBar _bar;
+        object _control;
+        bool _bLockUpdate = false;
+        public TrackBarEditor1()
+        {
+            _bar = new TrackBar();
+            _bar.TickFrequency = 10;
+            _bar.ValueChanged += TrackBar_ValueChanged;
+        }
+
+        private void TrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            if (!_bLockUpdate)
+            {
+                _bLockUpdate = true;
+                _control.SetPropertyValue("Value", _bar.Value);
+                _bLockUpdate = false;
             }
         }
+
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        {
+            return UITypeEditorEditStyle.Modal;
+        }
+        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
+        {
+            if (!_bLockUpdate)
+            {
+                try
+                {
+                    _control = context.Instance as MyProgressBar;
+                    int iMinimum = (int)_control.GetPropertyValue("Minimum");
+                    int iMaximum = (int)_control.GetPropertyValue("Maximum");
+                    if (iMinimum > iMaximum) Extension.Swap(ref iMinimum, ref iMaximum);
+                    int iValue = (int)value;
+                    if (iValue < iMinimum) iValue = iMinimum;
+                    else if (iValue > iMaximum) iValue = iMaximum;
+                    _bar.Minimum = iMinimum;
+                    _bar.Maximum = iMaximum;
+                    _bLockUpdate = true;
+                    _bar.Value = iValue;
+                    _bLockUpdate = false;
+                    IWindowsFormsEditorService service = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
+
+                    service.DropDownControl(_bar);
+                    return _bar.Value;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            return value;
+        }
+
+
     }
 }
+

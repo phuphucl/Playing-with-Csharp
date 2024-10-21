@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -50,6 +51,90 @@ namespace WindowsFormsApp1
             T temp = a;
             a = b;
             b = temp;
+        }
+
+        private static BindingFlags AllBinding = (BindingFlags)(-1);
+        public static object GetFieldValue(this object instance, string fieldName)
+        {
+            if (instance != null)
+            {
+                Type type = instance.GetType();
+                FieldInfo info = type.GetField(fieldName, AllBinding);
+                if (info != null)
+                {
+                    return info.GetValue(instance);
+                }
+            }
+            return null;
+        }
+        public static void SetFieldValue(this object instance, string fieldName, object value)
+        {
+            if (instance != null)
+            {
+                Type type = instance.GetType();
+                FieldInfo info = type.GetField(fieldName, AllBinding);
+                if (info != null)
+                {
+                    info.SetValue(instance, value);
+                }
+            }
+        }
+        public static object GetPropertyValue(this object instance, string propertyName)
+        {
+            if (instance != null)
+            {
+                Type type = instance.GetType();
+                PropertyInfo info = type.GetProperty(propertyName, AllBinding);
+                if (info != null && info.GetMethod != null)
+                {
+                    return info.GetValue(instance);
+                }
+            }
+            return null;
+        }
+        public static void SetPropertyValue(this object instance, string propertyName, object value)
+        {
+            if (instance != null)
+            {
+                Type type = instance.GetType();
+                PropertyInfo info = type.GetProperty(propertyName, AllBinding);
+                if (info != null && info.SetMethod != null)
+                {
+                    info.SetValue(instance, value);
+                }
+            }
+        }
+
+        public static object CallMethod(this object instance, string fieldName, params object[] args)
+        {
+            if (instance != null)
+            {
+                Type type = instance.GetType();
+                MethodInfo info = type.GetMethod(fieldName, AllBinding);
+                if (info != null)
+                {
+                    return info.Invoke(instance, args);
+                }
+            }
+            return null;
+        }
+
+        public static object CallMethod<T>(this object instance, string fieldName, params object[] args)
+        {
+            if (instance != null)
+            {
+                Type type = instance.GetType();
+                MethodInfo info = type.GetMethod(fieldName, AllBinding);
+                if (info != null)
+                {
+                    MethodInfo templateInfo = info.MakeGenericMethod(typeof(T));
+                    if (templateInfo != null)
+                    {
+                        return templateInfo.Invoke(instance, args);
+                    }
+                }
+            }
+            return null;
         }
     }
 }

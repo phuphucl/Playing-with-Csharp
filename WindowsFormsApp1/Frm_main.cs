@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,13 +14,26 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace WindowsFormsApp1
 {
+
     public partial class Frm_main : Form
     {
+        public const int WM_NCLBUTTONDOWN = 0xA1;
+        public const int HT_CAPTION = 0x2;
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern bool ReleaseCapture();
         private bool _bProcess = false;
 
         public unsafe Frm_main()
         {
             InitializeComponent();
+            //object[] args = { 56, "Name", DateTime.Now};
+            //int t = (int)myProgressBar2.CallMethod("Abc", args);
+
+            //object[] args = { 12, 45 };
+            //myProgressBar2.CallMethod<int>("SetProperty", args);
+
             //                                      x
             int number = 0x23F21789;// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -209,6 +223,24 @@ namespace WindowsFormsApp1
 
         private void myProgressBar1_Load(object sender, EventArgs e)
         {
+
+        }
+
+        private void myProgressBar2_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panel1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left )
+            {
+                if (ModifierKeys == Keys.Control)
+                {
+                    ReleaseCapture();
+                    SendMessage(panel1.Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+                }
+            }
 
         }
     }
