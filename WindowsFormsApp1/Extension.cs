@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -144,6 +145,19 @@ namespace WindowsFormsApp1
 
             TypedReference reference = __makeref(obj);
             return *(IntPtr*) &reference;
+        }
+        public static IntPtr GetPointer<T>(ref T obj) where T : struct
+        {
+            TypedReference reference = __makeref(obj);
+            return *(IntPtr*)&reference;
+        }
+
+        public static IntPtr GetPointer<T>(this T[] obj)
+        {
+            if (obj == null || obj.Length == 0) return IntPtr.Zero;
+
+            TypedReference reference = __makeref(obj[0]);
+            return *(IntPtr*)&reference;
         }
     }
 }

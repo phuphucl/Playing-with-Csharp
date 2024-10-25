@@ -24,6 +24,40 @@ namespace WindowsFormsApp1
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         public static extern bool ReleaseCapture();
         private bool _bProcess = false;
+        //x ^ key = y ==> y ^ key = x
+        //salt
+        //start = 0x
+        private byte[] MyArray =
+        {
+            //Entry Key
+            0xd0, 0x9c, 0x19, 0x6f, 0x7b, 0x87, 0x4f, 0xa0, 0xba, 0xc, 0xa5, 0x17, 0x65, 0x8d, 0x37, 0xaf,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        };
+        private int Number = 100;
 
         public unsafe Frm_main()
         {
@@ -34,11 +68,18 @@ namespace WindowsFormsApp1
             //          10003ABC2000                 MyStruct3  B1 I B2 
             InitializeComponent();//C C++ sizeof(int) == operating system
 
+            byte[] search = { 123, 67, 89 };
+
+
+
+            int index = Find(MyArray, search, 0);
 
             Text = "ProgressBar Demo " + (sizeof(IntPtr) == 8 ? "64 bit" : "32 bit");
 
             int sz1 = sizeof(MyStruct2);
-            MyStruct3[] array = new MyStruct3[2];//Fragmentation
+            MyStruct3[] array = new MyStruct3[2];
+            //                    012345678901 012345678901
+            //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             array[0].B1 = 1;
             array[0].B2 = 2;
             array[0].I = 0x0C0B0A03;
@@ -47,16 +88,21 @@ namespace WindowsFormsApp1
             array[1].B2 = 5;
             array[1].I = 0x0F0E0D06;
 
+            IntPtr ptrArray = array.GetPointer();
+            IntPtr ptrArrayCorrect = Extension.GetPointer(ref array[1]);
+
             MyClass3 c = new MyClass3();
             c.B1 = 9; c.I = 8976; c.B2 = 67;
 
             IntPtr ptr = c.GetPointer();
             byte* pM = (byte*)ptr;
 
-            //MyStruct3 myStr = new MyStruct3();
-            //MyStruct3* strPtr = &myStr;
+     
 
             MyClass3[] arrC3 = new MyClass3[5]; //create 5 class c
+            byte* ppp = (byte*)arrC3.GetPointer();
+            //              01230123012301230123                                
+            //xxxxxxxxxxxxxx00000000000000000000xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             MyClass3 c0 = new MyClass3(); c0.I = 0;
             MyClass3 c1 = new MyClass3(); c1.I = 1;
             MyClass3 c2 = new MyClass3(); c2.I = 2;
@@ -67,17 +113,12 @@ namespace WindowsFormsApp1
             arrC3[2] = c2;
             arrC3[3] = c3;
             arrC3[4] = c4;
+            MyClass3* pC3 = (MyClass3*)arrC3.GetPointer();
 
-            MyClass3* pC3 = (MyClass3*)arrC3[0].GetPointer();
-            
-
-            //for (int i = 0; i < arrC3.Length; i++)
-            //{
-            //    fixed (MyClass3* pC3 = &arrC3[i])
-            //    {
-            //        Debug.Print("I[" + i + "] = " + pC3->I);
-            //    }
-            //}
+            for (int i = 0; i < arrC3.Length; i++, pC3++)
+            {
+                Debug.Print("I[" + i + "] = " + pC3->I);
+            }
 
             var t = array;
 
@@ -134,7 +175,33 @@ namespace WindowsFormsApp1
             myBuffer.SetValue(10, 50);
             myBuffer.GetInt(10);
         }
-
+        //company want to write an application about ....
+        //user must login: userName + password
+        private int Find(byte[] array, byte[] search, int startIndex)
+        {
+            if (search == null || array == null || search.Length > array.Length) return -1;//short circuit
+            int arrLength = array.Length;
+            int srcLength = search.Length;
+            int difLength = arrLength - srcLength;
+            if (startIndex < 0) startIndex = 0;
+            if (startIndex > difLength) return -1;
+            for (int i = startIndex; i < difLength; i++)
+            {
+                // 12 9 1 9 0 9 2
+                //        9 0 9
+                bool found = true;
+                for (int j = 0; j < srcLength; j++)
+                {
+                    if (array[i + j] != search[j])
+                    {
+                        found = false;
+                        break;
+                    }
+                }
+                if (found) return i;
+            }
+            return -1;
+        }
 
         private void label1_Click(object sender, EventArgs e)
         {
