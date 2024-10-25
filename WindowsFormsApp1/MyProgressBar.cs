@@ -19,7 +19,7 @@ using System.Xml.Linq;
 namespace WindowsFormsApp1
 {
     [Designer(typeof(MyProgressDesigner))]
-    public partial class MyProgressBar : UserControl, IDisposable
+    public partial class MyProgressBar : UserControl, IDisposable, ITrackBarEditor
     {
         public enum EnProgressDirection
         {
@@ -267,6 +267,30 @@ namespace WindowsFormsApp1
             return m + 1;
         }
 
+        int ITrackBarEditor.GetMin()
+        {
+            return Minimum;
+        }
+
+        int ITrackBarEditor.GetMax()
+        {
+            return Maximum;
+        }
+
+        int ITrackBarEditor.GetValue()
+        {
+            return Value;
+        }
+
+        void ITrackBarEditor.SetValue(int value)
+        {
+            Value = value;
+        }
+
+        public override string ToString()
+        {
+            return "Min: " + _iMin + ", Max: " + _iMax + ", Value: " + _iValue;
+        }
         private class MyProgressDesigner: ControlDesigner
         {
             private DesignerActionListCollection _actions;
@@ -305,7 +329,9 @@ namespace WindowsFormsApp1
                 _collectionItems.Add(new DesignerActionMethodItem(this, "Setup", "Setup", true));
 
                 _collectionItems.Add(new DesignerActionMethodItem(this, "Venha", "Go Home"));
+
             }
+
 
             private void Setup()
             {

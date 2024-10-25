@@ -27,8 +27,63 @@ namespace WindowsFormsApp1
 
         public unsafe Frm_main()
         {
-            InitializeComponent();
-            //object[] args = { 56, "Name", DateTime.Now};
+            //          pM1
+            //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            //          12003ABC                     MyStruct1
+            //          3ABC1200                     MyStruct2 
+            //          10003ABC2000                 MyStruct3  B1 I B2 
+            InitializeComponent();//C C++ sizeof(int) == operating system
+
+
+            Text = "ProgressBar Demo " + (sizeof(IntPtr) == 8 ? "64 bit" : "32 bit");
+
+            int sz1 = sizeof(MyStruct2);
+            MyStruct3[] array = new MyStruct3[2];//Fragmentation
+            array[0].B1 = 1;
+            array[0].B2 = 2;
+            array[0].I = 0x0C0B0A03;
+
+            array[1].B1 = 4;
+            array[1].B2 = 5;
+            array[1].I = 0x0F0E0D06;
+
+            MyClass3 c = new MyClass3();
+            c.B1 = 9; c.I = 8976; c.B2 = 67;
+
+            IntPtr ptr = c.GetPointer();
+            byte* pM = (byte*)ptr;
+
+            //MyStruct3 myStr = new MyStruct3();
+            //MyStruct3* strPtr = &myStr;
+
+            MyClass3[] arrC3 = new MyClass3[5]; //create 5 class c
+            MyClass3 c0 = new MyClass3(); c0.I = 0;
+            MyClass3 c1 = new MyClass3(); c1.I = 1;
+            MyClass3 c2 = new MyClass3(); c2.I = 2;
+            MyClass3 c3 = new MyClass3(); c3.I = 3;
+            MyClass3 c4 = new MyClass3(); c4.I = 4;
+            arrC3[0] = c0;
+            arrC3[1] = c1;
+            arrC3[2] = c2;
+            arrC3[3] = c3;
+            arrC3[4] = c4;
+
+            MyClass3* pC3 = (MyClass3*)arrC3[0].GetPointer();
+            
+
+            //for (int i = 0; i < arrC3.Length; i++)
+            //{
+            //    fixed (MyClass3* pC3 = &arrC3[i])
+            //    {
+            //        Debug.Print("I[" + i + "] = " + pC3->I);
+            //    }
+            //}
+
+            var t = array;
+
+            int sz2 = sizeof(MyStruct2);
+            int sz3 = sizeof(MyStruct3);
+
             //int t = (int)myProgressBar2.CallMethod("Abc", args);
 
             //object[] args = { 12, 45 };
@@ -36,6 +91,8 @@ namespace WindowsFormsApp1
 
             //                                      x
             int number = 0x23F21789;// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+           //myProgressBar1.Get
 
 
             // Test Extension

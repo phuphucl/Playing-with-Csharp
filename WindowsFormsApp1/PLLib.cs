@@ -1,6 +1,8 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -277,5 +279,92 @@ namespace WindowsFormsApp1
         }
     }
 
+    //byte sbyte: 8bit
+    //short ushort char: 16bit, 2byte
+    //int uint: 32bit, 4byte
+    //long ulong: 64bit, 8byte
+    //float: 32bit
+    //double: 64bit
+    //decimal: 128
+
+    //DateTime: 64bit
+
+    public struct MyStruct1
+    {
+        public byte B1;
+        public byte B2;
+        public int I;
+    }
+    public struct MyStruct2
+    {
+        public int I;
+        public byte B1;
+        public byte B2;
+
+        public override string ToString()
+        {
+            return "This is myStruct2";
+        }
+
+    }
+    public struct MyStruct3
+    {
+        public byte B1;
+        public int I;
+        public byte B2;
+
+        public MyStruct3(byte b1, int i, byte b2)
+        {
+            B1 = b1; 
+            I = i; 
+            B2 = b2; 
+        }
+    }
+    public class MyClass3
+    {
+        public byte B1;
+        public int I;
+        public byte B2;
+
+        public static implicit operator int(MyClass3 c)
+        {
+            return c.I;
+        }
+
+        public static implicit operator MyClass3(int value)
+        {
+            MyClass3 c = new MyClass3();
+            c.I = value;
+            return c;
+        }
+        //ARGB
+        public static implicit operator MyClass3(string value) 
+        {
+            MyClass3 c = new MyClass3();
+            string[] s = value.Split(','); 
+            if (s.Length > 0 && byte.TryParse(s[0].Trim(), out byte result1)) c.B1 = result1;
+            if (s.Length > 1 && int.TryParse(s[1].Trim(), out int result2)) c.I = result2;
+            if (s.Length > 2 && byte.TryParse(s[2].Trim(), out byte result3)) c.B2 = result3;
+            return c;
+        }
+
+        public static MyClass3 operator +(MyClass3 c1, MyClass3 c2)
+        {
+            MyClass3 c = new MyClass3();
+            c.I = c1.I + c2.I;
+            c.B1 = (byte) (c1.B1 + c2.B1);
+            c.B2 = (byte) (c1.B2 + c2.B2);
+            return c;
+        }
+
+        public static bool operator == (MyClass3 c1, MyClass3 c2)
+        {
+            return (c1.I == c2.I);
+        }
+        public static bool operator !=(MyClass3 c1, MyClass3 c2)
+        {
+            return (c1.I != c2.I);
+        }
+    }
 }
 

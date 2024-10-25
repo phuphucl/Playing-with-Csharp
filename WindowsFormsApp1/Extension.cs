@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp1
 {
+#pragma warning disable
     internal unsafe static class Extension
     {
         [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
@@ -135,6 +136,14 @@ namespace WindowsFormsApp1
                 }
             }
             return null;
+        }
+
+        public static IntPtr GetPointer(this object obj)
+        {
+            if (obj == null) return IntPtr.Zero;
+
+            TypedReference reference = __makeref(obj);
+            return *(IntPtr*) &reference;
         }
     }
 }

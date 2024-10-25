@@ -38,7 +38,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.myProgressBar1 = new WindowsFormsApp1.MyProgressBar();
-            this.myProgressBar2 = new WindowsFormsApp1.MyProgressBar();
             this.SuspendLayout();
             // 
             // label1
@@ -130,7 +129,7 @@
             this.myProgressBar1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.myProgressBar1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.myProgressBar1.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.myProgressBar1.Location = new System.Drawing.Point(343, 314);
+            this.myProgressBar1.Location = new System.Drawing.Point(213, 333);
             this.myProgressBar1.LockUpdate = false;
             this.myProgressBar1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.myProgressBar1.Maximum = 100;
@@ -138,35 +137,17 @@
             this.myProgressBar1.Name = "MyProgressBar";
             this.myProgressBar1.ProgressDirection = WindowsFormsApp1.MyProgressBar.EnProgressDirection.Horizontal;
             this.myProgressBar1.Size = new System.Drawing.Size(173, 19);
-            this.myProgressBar1.TabIndex = 11;
+            this.myProgressBar1.TabIndex = 13;
             this.myProgressBar1.TextColor = System.Drawing.Color.Black;
-            this.myProgressBar1.Value = 0;
-            // 
-            // myProgressBar2
-            // 
-            this.myProgressBar2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.myProgressBar2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.myProgressBar2.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.myProgressBar2.Location = new System.Drawing.Point(122, 304);
-            this.myProgressBar2.LockUpdate = false;
-            this.myProgressBar2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.myProgressBar2.Maximum = 100;
-            this.myProgressBar2.Minimum = 0;
-            this.myProgressBar2.Name = "myProgressBar2";
-            this.myProgressBar2.ProgressDirection = WindowsFormsApp1.MyProgressBar.EnProgressDirection.Horizontal;
-            this.myProgressBar2.Size = new System.Drawing.Size(173, 19);
-            this.myProgressBar2.TabIndex = 13;
-            this.myProgressBar2.TextColor = System.Drawing.Color.Black;
-            this.myProgressBar2.Value = 0;
+            this.myProgressBar1.Value = 25;
             // 
             // Frm_main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.myProgressBar2);
-            this.Controls.Add(this.panel1);
             this.Controls.Add(this.myProgressBar1);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.button1);
@@ -193,9 +174,8 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label label2;
-        private MyProgressBar myProgressBar1;
         private System.Windows.Forms.Panel panel1;
-        private MyProgressBar myProgressBar2;
+        private MyProgressBar myProgressBar1;
     }
 }
 
