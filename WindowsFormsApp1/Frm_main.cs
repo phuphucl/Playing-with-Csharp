@@ -11,11 +11,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using PLLibrary;
 
 namespace WindowsFormsApp1
 {
 
-    public partial class Frm_main : Form
+    public unsafe partial class Frm_main : Form
     {
         public const int WM_NCLBUTTONDOWN = 0xA1;
         public const int HT_CAPTION = 0x2;
@@ -27,9 +28,10 @@ namespace WindowsFormsApp1
         //x ^ key = y ==> y ^ key = x
         //salt
         //start = 0x
-        private byte[] MyArray =
+        private byte[] MyArray = 
         {
             //Entry Key
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0xd0, 0x9c, 0x19, 0x6f, 0x7b, 0x87, 0x4f, 0xa0, 0xba, 0xc, 0xa5, 0x17, 0x65, 0x8d, 0x37, 0xaf,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -42,6 +44,7 @@ namespace WindowsFormsApp1
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0xd0, 0x9c, 0x19, 0x6f, 0x7b, 0x87, 0x4f, 0xa0, 0xba, 0xc, 0xa5, 0x17, 0x65, 0x8d, 0x37, 0xaf,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -58,9 +61,34 @@ namespace WindowsFormsApp1
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         };
         private int Number = 100;
-
-        public unsafe Frm_main()
+        private PLThread thread;
+        // CAD(Paint, Photoshop)
+        // Chat (TCP/IP, UDP, Web) tCPcLIENT, tCPsERVER
+        //     InterCommunication (sendmessage, shared-memory, clipboard), 
+        // 
+        public unsafe Frm_main() 
         {
+            thread = new PLThread(50);
+            thread.ThreadRun += Thread_ThreadRun;
+            thread.ThreadStart += Thread_ThreadStart;
+
+            thread.Start();
+            //Debug.Print(CGeneric.Hello());
+
+            int[] iArray1 = new int[] { 0, 1 };
+            int[] iArray2 = new int[4];
+            int[] iArray3 = { 0, 1, 2, 3 };
+            int[] iArray4 = null;
+            List<int> Lst = new List<int>(iArray1);
+            Lst.Find(item => item > 6 && item < 12);
+            Lst.Sort((a, b) => b.CompareTo(a) ); //inc, dec
+            for (int i = 0; i<Lst.Count; i++) //Head(0)      Cur(123)         Tail(999999)
+                //                      Lst[10], 124 - 0, Math.Abs(124 - 123),   9999999 - 124
+            {
+               // Lst[10000];
+            }
+
+
             //          pM1
             //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             //          12003ABC                     MyStruct1
@@ -68,11 +96,28 @@ namespace WindowsFormsApp1
             //          10003ABC2000                 MyStruct3  B1 I B2 
             InitializeComponent();//C C++ sizeof(int) == operating system
 
-            byte[] search = { 123, 67, 89 };
+            this.FormClosing += Frm_main_FormClosing;
+            this.FormClosed += Frm_main_FormClosed;
 
-
-
+            byte[] search = { 0xd0, 0x9c, 0x19, 0x6f, 0x7b, 0x87, 0x4f, 0xa0, 0xba, 0xc, 0xa5, 0x17, 0x65, 0x8d, 0x37, 0xaf };
             int index = Find(MyArray, search, 0);
+            if (index >=0)
+            {
+                int index2 = Find(MyArray, search, index+1);
+            }
+            //    01234567890123456789012345678901
+            //    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  bitwise
+            //    00000000000000011111100000000000                            
+            // << >> & ^ | !
+            int n1 = 9999999;
+            int n2 = ( n1 & 0x0000FF00) >> 8;
+            float f1 = float.PositiveInfinity;
+            float f2 = 12.23455678905f;
+            byte* pf = (byte*)&f1;
+            pf[2] = 192;
+            pf[3] = 255;
+
+            if (Math.Abs(f1-f2) < 0.000001)
 
             Text = "ProgressBar Demo " + (sizeof(IntPtr) == 8 ? "64 bit" : "32 bit");
 
@@ -89,7 +134,7 @@ namespace WindowsFormsApp1
             array[1].I = 0x0F0E0D06;
 
             IntPtr ptrArray = array.GetPointer();
-            IntPtr ptrArrayCorrect = Extension.GetPointer(ref array[1]);
+            IntPtr ptrArrayCorrect = Extension.GetPointer(ref array[0]);
 
             MyClass3 c = new MyClass3();
             c.B1 = 9; c.I = 8976; c.B2 = 67;
@@ -174,6 +219,60 @@ namespace WindowsFormsApp1
             PLLib.Buffer myBuffer = new PLLib.Buffer();
             myBuffer.SetValue(10, 50);
             myBuffer.GetInt(10);
+        }
+
+        private void Thread_ThreadStart(object sender, PLThread.ThreadStartEventArgs e)
+        {
+            e.Cancel = true;
+        }
+
+        private void Thread_ThreadStop(string abc, DateTime tm)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool _bReady = false;
+        protected override void OnShown(EventArgs e)
+        {
+            _bReady = true;
+            lock (o)
+            {
+
+            }
+            base.OnShown(e);
+        }
+        object o = new object();
+        private void Thread_ThreadRun(object sender, EventArgs e)
+        {
+            lock(o)
+            {
+
+            }
+            if (_bReady)
+            {
+                
+            }
+        }
+
+        private void Frm_main_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            thread.Dispose();
+        }
+
+        private void Frm_main_FormClosing(object sender, FormClosingEventArgs e)
+        {
+        }
+
+        private int GetValue //int get_GetValue()  void set_GetValue(int value)
+        {
+            get
+            {
+                return 100;
+            }
+            set
+            {
+                Debug.Print(value.ToString());  
+            }
         }
         //company want to write an application about ....
         //user must login: userName + password
@@ -318,15 +417,10 @@ namespace WindowsFormsApp1
 
         }
 
-
-        private void BtnCancel_Click(object sender, EventArgs e)
+        private void BtnGeneric_Click(object sender, EventArgs e)
         {
-            _bProcess = false;
-        }
-
-        private void BtnClear_Click(object sender, EventArgs e)
-        {
-            label1.Text = "";
+            if (sender == BtnCancel) _bProcess = false;
+            else if (sender == BtnClear) label1.Text = "";
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -369,3 +463,4 @@ namespace WindowsFormsApp1
         }
     }
 }
+

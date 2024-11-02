@@ -77,7 +77,7 @@
             this.BtnCancel.TabIndex = 3;
             this.BtnCancel.Text = "Cancel";
             this.BtnCancel.UseVisualStyleBackColor = true;
-            this.BtnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
+            this.BtnCancel.Click += new System.EventHandler(this.BtnGeneric_Click);
             // 
             // BtnClear
             // 
@@ -87,7 +87,7 @@
             this.BtnClear.TabIndex = 4;
             this.BtnClear.Text = "Clear";
             this.BtnClear.UseVisualStyleBackColor = true;
-            this.BtnClear.Click += new System.EventHandler(this.BtnClear_Click);
+            this.BtnClear.Click += new System.EventHandler(this.BtnGeneric_Click);
             // 
             // button1
             // 
